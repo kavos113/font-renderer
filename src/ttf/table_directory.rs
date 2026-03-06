@@ -48,4 +48,8 @@ impl TTFTableDirectory {
             table_records: font_table_records,
         }
     }
+
+    pub fn get_table_record(&self, tag: &Tag) -> Option<&TTFTableRecord> {
+        self.table_records.iter().find(|record| record.tag == *tag)
+    }
 }

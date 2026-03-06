@@ -1,4 +1,4 @@
-mod table_directory;
-mod types;
-pub(crate) mod table;
-mod glyph;
+pub mod table_directory;
+pub mod types;
+pub mod table;
+pub mod glyph;

@@ -1,4 +1,4 @@
-use crate::ttf::types::{int16, uint16, uint32, Fixed, Version16Dot16, LONGDATETIME};
+use crate::ttf::types::{int16, uint16, uint32, Fixed, Reader, Tag, Version16Dot16, LONGDATETIME};
 
 pub struct HeadTable {
     pub major_version: uint16,
@@ -22,7 +22,9 @@ pub struct HeadTable {
 }
 
 impl HeadTable {
-    pub fn read_from(reader: &mut crate::ttf::types::Reader) -> Self {
+    pub const TAG: &str = "head";
+
+    pub fn read_from(reader: &mut Reader) -> Self {
         HeadTable {
             major_version: reader.read_uint16(),
             minor_version: reader.read_uint16(),
@@ -75,7 +77,9 @@ pub enum MaxpTable {
 }
 
 impl MaxpTable {
-    pub fn read_from(reader: &mut crate::ttf::types::Reader) -> Self {
+    pub const TAG: &str = "maxp";
+
+    pub fn read_from(reader: &mut Reader) -> Self {
         let version = reader.read_version16dot16();
         let num_glyphs = reader.read_uint16();
 

@@ -15,6 +15,7 @@ pub type Offset32 = u32;
 
 pub struct F2DOT14(i16);
 pub struct LONGDATETIME(i64);
+#[derive(Eq, PartialEq)]
 pub struct Tag(u32);
 #[derive(Eq, PartialEq)]
 pub struct Version16Dot16(u32);
@@ -83,7 +84,7 @@ impl LONGDATETIME {
     }
 }
 
-pub struct Reader<'a>(&'a [u8]);
+pub struct Reader<'a>(pub &'a [u8]);
 
 impl<'a> Reader<'a> {
     pub fn read_uint8(&mut self) -> uint8 {
