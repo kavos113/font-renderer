@@ -232,4 +232,11 @@ impl<'a> Reader<'a> {
 
         Version16Dot16(u32::from_be_bytes(buf.try_into().unwrap()))
     }
+
+    pub fn read(&mut self, size: usize) -> &'a [u8] {
+        let (buf, rest) = self.current.split_at(size);
+        self.current = rest;
+
+        buf
+    }
 }
