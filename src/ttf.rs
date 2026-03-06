@@ -1,3 +1,4 @@
 mod table_directory;
 mod types;
-mod table;
+pub(crate) mod table;
+mod glyph;
