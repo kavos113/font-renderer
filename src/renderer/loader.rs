@@ -51,7 +51,7 @@ impl Font<'_> {
         }
     }
 
-    fn load_loca(&mut self) {
+    pub fn read_loca(&mut self) {
         let loca_record = self
             .directory
             .get_table_record(&Tag::from_str("loca"))
@@ -69,5 +69,24 @@ impl Font<'_> {
                 .map(|_| self.reader.read_uint32())
                 .collect()
         };
+    }
+
+    pub fn read_glyf(&mut self) {
+        if self.loca.is_empty() {
+            self.read_loca();
+        }
+
+        let glyf_record = self
+            .directory
+            .get_table_record(&Tag::from_str("glyf"))
+            .expect("Failed to find 'glyf' table");
+
+        self.reader.seek(glyf_record.offset as usize);
+
+        for offset in &self.loca {
+            self.reader.seek(glyf_record.offset as usize + *offset as usize);
+            let glyph = Glyph::read_from(&mut self.reader);
+            self.glyf.push(glyph);
+        }
     }
 }
