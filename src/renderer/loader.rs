@@ -1,17 +1,20 @@
-use std::fs;
+use crate::ttf::glyph::Glyph;
 use crate::ttf::table::{HeadTable, MaxpTable};
 use crate::ttf::table_directory::TTFTableDirectory;
 use crate::ttf::types::{Reader, Tag};
 
-pub struct Font {
+pub struct Font<'a> {
+    data: &'a [u8],
+    reader: Reader<'a>,
     head: HeadTable,
     maxp: MaxpTable,
+    loca: Vec<u32>,
+    glyf: Vec<Glyph>,
 }
 
-impl Font {
-    pub fn from_file(path: &str) -> Self {
-        let buffer = fs::read(path).expect("Failed to read font file");
-        let mut r = Reader::new(&buffer);
+impl Font<'_> {
+    pub fn from_file(data: &'_ [u8]) -> Font<'_> {
+        let mut r = Reader::new(data);
 
         let table_directory = TTFTableDirectory::read_from(&mut r);
 
@@ -29,6 +32,13 @@ impl Font {
         r.seek(maxp_record.offset as usize);
         let maxp = MaxpTable::read_from(&mut r);
 
-        Font { head, maxp }
+        Font {
+            data,
+            reader: r,
+            head,
+            maxp,
+            loca: vec![],
+            glyf: vec![],
+        }
     }
 }
