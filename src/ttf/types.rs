@@ -16,6 +16,7 @@ pub type Offset32 = u32;
 pub struct F2DOT14(i16);
 pub struct LONGDATETIME(i64);
 pub struct Tag(u32);
+#[derive(Eq, PartialEq)]
 pub struct Version16Dot16(u32);
 
 impl F2DOT14 {
@@ -56,6 +57,10 @@ impl Tag {
 }
 
 impl Version16Dot16 {
+    pub fn from_major_minor(major: u16, minor: u16) -> Self {
+        Version16Dot16(((major as u32) << 16) | (minor as u32))
+    }
+
     pub fn to_string(&self) -> String {
         let major = self.0 >> 16;
         let minor = self.0 & 0xFFFF;
