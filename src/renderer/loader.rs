@@ -4,7 +4,6 @@ use crate::ttf::table_directory::TTFTableDirectory;
 use crate::ttf::types::{Reader, Tag};
 
 pub struct Font<'a> {
-    data: &'a [u8],
     reader: Reader<'a>,
     directory: TTFTableDirectory,
     head: HeadTable,
@@ -14,7 +13,7 @@ pub struct Font<'a> {
 }
 
 impl Font<'_> {
-    pub fn from_file(data: &'_ [u8]) -> Font<'_> {
+    pub fn from_data(data: &'_ [u8]) -> Font<'_> {
         let mut r = Reader::new(data);
 
         let table_directory = TTFTableDirectory::read_from(&mut r);
@@ -41,7 +40,6 @@ impl Font<'_> {
         };
 
         Font {
-            data,
             reader: r,
             directory: table_directory,
             head,
