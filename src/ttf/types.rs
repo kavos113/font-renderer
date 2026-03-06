@@ -84,131 +84,151 @@ impl LONGDATETIME {
     }
 }
 
-pub struct Reader<'a>(pub &'a [u8]);
+pub struct Reader<'a> {
+    full_data: &'a [u8],
+    current: &'a [u8],
+}
 
 impl<'a> Reader<'a> {
+    pub fn new(data: &'a [u8]) -> Self {
+        Reader {
+            full_data: data,
+            current: data,
+        }
+    }
+
+    pub fn seek(&mut self, offset: usize) {
+        if offset < self.full_data.len() {
+            self.current = &self.full_data[offset..];
+        }
+    }
+
+    pub fn tell(&self) -> usize {
+        self.full_data.len() - self.current.len()
+    }
+
     pub fn read_uint8(&mut self) -> uint8 {
-        let (buf, rest) = self.0.split_at(1);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(1);
+        self.current = rest;
 
         buf[0]
     }
 
     pub fn read_int8(&mut self) -> int8 {
-        let (buf, rest) = self.0.split_at(1);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(1);
+        self.current = rest;
 
         buf[0] as i8
     }
 
     pub fn read_uint16(&mut self) -> uint16 {
-        let (buf, rest) = self.0.split_at(2);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(2);
+        self.current = rest;
 
         u16::from_be_bytes(buf.try_into().unwrap())
     }
 
     pub fn read_int16(&mut self) -> int16 {
-        let (buf, rest) = self.0.split_at(2);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(2);
+        self.current = rest;
 
         i16::from_be_bytes(buf.try_into().unwrap())
     }
 
     pub fn read_uint24(&mut self) -> uint24 {
-        let (buf, rest) = self.0.split_at(3);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(3);
+        self.current = rest;
 
         [buf[0], buf[1], buf[2]]
     }
 
     pub fn read_uint32(&mut self) -> uint32 {
-        let (buf, rest) = self.0.split_at(4);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(4);
+        self.current = rest;
 
         u32::from_be_bytes(buf.try_into().unwrap())
     }
 
     pub fn read_int32(&mut self) -> int32 {
-        let (buf, rest) = self.0.split_at(4);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(4);
+        self.current = rest;
 
         i32::from_be_bytes(buf.try_into().unwrap())
     }
 
     pub fn read_fixed(&mut self) -> Fixed {
-        let (buf, rest) = self.0.split_at(4);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(4);
+        self.current = rest;
 
         i32::from_be_bytes(buf.try_into().unwrap())
     }
 
     pub fn read_fword(&mut self) -> FWORD {
-        let (buf, rest) = self.0.split_at(2);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(2);
+        self.current = rest;
 
         i16::from_be_bytes(buf.try_into().unwrap())
     }
 
     pub fn read_ufword(&mut self) -> UFWORD {
-        let (buf, rest) = self.0.split_at(2);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(2);
+        self.current = rest;
 
         u16::from_be_bytes(buf.try_into().unwrap())
     }
 
     pub fn read_f2dot14(&mut self) -> F2DOT14 {
-        let (buf, rest) = self.0.split_at(2);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(2);
+        self.current = rest;
 
         F2DOT14(i16::from_be_bytes(buf.try_into().unwrap()))
     }
 
     pub fn read_longdatetime(&mut self) -> LONGDATETIME {
-        let (buf, rest) = self.0.split_at(8);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(8);
+        self.current = rest;
 
         LONGDATETIME(i64::from_be_bytes(buf.try_into().unwrap()))
     }
 
     pub fn read_tag(&mut self) -> Tag {
-        let (buf, rest) = self.0.split_at(4);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(4);
+        self.current = rest;
 
         Tag(u32::from_be_bytes(buf.try_into().unwrap()))
     }
 
     pub fn read_offset8(&mut self) -> Offset8 {
-        let (buf, rest) = self.0.split_at(1);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(1);
+        self.current = rest;
 
         buf[0]
     }
 
     pub fn read_offset16(&mut self) -> Offset16 {
-        let (buf, rest) = self.0.split_at(2);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(2);
+        self.current = rest;
 
         u16::from_be_bytes(buf.try_into().unwrap())
     }
 
     pub fn read_offset24(&mut self) -> Offset24 {
-        let (buf, rest) = self.0.split_at(3);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(3);
+        self.current = rest;
 
         [buf[0], buf[1], buf[2]]
     }
 
     pub fn read_offset32(&mut self) -> Offset32 {
-        let (buf, rest) = self.0.split_at(4);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(4);
+        self.current = rest;
 
         u32::from_be_bytes(buf.try_into().unwrap())
     }
 
     pub fn read_version16dot16(&mut self) -> Version16Dot16 {
-        let (buf, rest) = self.0.split_at(4);
-        self.0 = rest;
+        let (buf, rest) = self.current.split_at(4);
+        self.current = rest;
 
         Version16Dot16(u32::from_be_bytes(buf.try_into().unwrap()))
     }

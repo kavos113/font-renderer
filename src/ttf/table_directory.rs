@@ -1,10 +1,10 @@
 use crate::ttf::types::{uint16, uint32, Offset32, Reader, Tag};
 
 pub struct TTFTableRecord {
-    tag: Tag,
-    checksum: uint32,
-    offset: Offset32,
-    length: uint32,
+    pub tag: Tag,
+    pub checksum: uint32,
+    pub offset: Offset32,
+    pub length: uint32,
 }
 
 impl TTFTableRecord {
@@ -19,12 +19,12 @@ impl TTFTableRecord {
 }
 
 pub struct TTFTableDirectory {
-    sfnt_version: uint32,
-    num_tables: uint16,
-    search_range: uint16,
-    entry_selector: uint16,
-    range_shift: uint16,
-    table_records: Vec<TTFTableRecord>,
+    pub sfnt_version: uint32,
+    pub num_tables: uint16,
+    pub search_range: uint16,
+    pub entry_selector: uint16,
+    pub range_shift: uint16,
+    pub table_records: Vec<TTFTableRecord>,
 }
 
 impl TTFTableDirectory {

@@ -11,7 +11,7 @@ pub struct Font {
 impl Font {
     pub fn from_file(path: &str) -> Self {
         let buffer = fs::read(path).expect("Failed to read font file");
-        let mut r = Reader(&buffer);
+        let mut r = Reader::new(&buffer);
 
         let table_directory = TTFTableDirectory::read_from(&mut r);
 
@@ -22,5 +22,13 @@ impl Font {
         let maxp_record = table_directory
             .get_table_record(&Tag::from_str(MaxpTable::TAG))
             .expect("Failed to find 'maxp' table");
+
+        r.seek(head_record.offset as usize);
+        let head = HeadTable::read_from(&mut r);
+
+        r.seek(maxp_record.offset as usize);
+        let maxp = MaxpTable::read_from(&mut r);
+
+        Font { head, maxp }
     }
 }
