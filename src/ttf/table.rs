@@ -1,4 +1,4 @@
-use crate::ttf::types::{int16, uint16, uint32, Fixed, Reader, Tag, Version16Dot16, LONGDATETIME};
+use crate::ttf::types::{Fixed, LONGDATETIME, Reader, Tag, Version16Dot16, int16, uint16, uint32};
 
 pub struct HeadTable {
     pub major_version: uint16,
@@ -84,7 +84,10 @@ impl MaxpTable {
         let num_glyphs = reader.read_uint16();
 
         if version == Version16Dot16::from_major_minor(0, 5) {
-            MaxpTable::Version0_5(MaxpTable0_5 { version, num_glyphs })
+            MaxpTable::Version0_5(MaxpTable0_5 {
+                version,
+                num_glyphs,
+            })
         } else if version == Version16Dot16::from_major_minor(1, 0) {
             MaxpTable::Version1_0(MaxpTable1_0 {
                 version,

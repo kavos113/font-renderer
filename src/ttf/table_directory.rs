@@ -1,4 +1,4 @@
-use crate::ttf::types::{uint16, uint32, Offset32, Reader, Tag};
+use crate::ttf::types::{Offset32, Reader, Tag, uint16, uint32};
 
 pub struct TTFTableRecord {
     pub tag: Tag,

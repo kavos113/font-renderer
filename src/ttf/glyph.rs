@@ -1,4 +1,4 @@
-use crate::ttf::types::{int16, uint16, uint8, Reader};
+use crate::ttf::types::{Reader, int16, uint8, uint16};
 
 pub struct GlyphHeader {
     number_of_contours: int16,
