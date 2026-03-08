@@ -1,4 +1,3 @@
-use std::process::id;
 use crate::ttf::types::{int16, uint16, uint24, uint32, uint8, Offset32, Reader};
 
 pub struct CmapHeader {
