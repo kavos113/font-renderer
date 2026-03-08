@@ -49,11 +49,17 @@ impl Font<'_> {
 
         let header = CmapHeader::read_from(&mut r);
 
-        // example: platform_id = 3 (Windows), encoding_id = 1 (Unicode BMP)
+        // example: platform_id = 0 (Unicode), encoding_id = 3 (Unicode BMP)
         let subtable = header
             .encoding_records
             .iter()
-            .find(|record| record.platform_id == PlatformId::Windows && record.encoding_id == 1);
+            .find(|record| record.platform_id == PlatformId::Unicode && record.encoding_id == 3);
+
+        header
+            .encoding_records
+            .iter()
+            .for_each(|record| println!("Found 'cmap' encoding record: {:?}", record));
+
 
         let cmap_subtable = if let Some(record) = subtable {
             r.seek(cmap_record.offset as usize + record.offset as usize);

@@ -14,4 +14,7 @@ fn main() {
     let buf = fs::read(&args[1]).expect("Failed to read font file");
 
     let mut font = Font::from_data(&*buf);
+    font.read_glyf();
+
+    font.render_glyph(0x41); // Render 'A'
 }

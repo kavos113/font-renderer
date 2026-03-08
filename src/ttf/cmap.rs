@@ -7,13 +7,14 @@ pub struct CmapHeader {
     pub encoding_records: Vec<CmapEncodingRecord>,
 }
 
+#[derive(Debug)]
 pub struct CmapEncodingRecord {
     pub platform_id: PlatformId,
     pub encoding_id: uint16,
     pub offset: uint16,
 }
 
-#[derive(Eq, PartialEq)]
+#[derive(Eq, PartialEq, Debug)]
 pub enum PlatformId {
     Unicode = 0,
     Macintosh = 1,
