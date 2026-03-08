@@ -2,7 +2,7 @@ use crate::ttf::cmap::{CmapHeader, CmapSubtable, PlatformId};
 use crate::ttf::glyph::Glyph;
 use crate::ttf::table::{HeadTable, MaxpTable, MaxpTable1_0};
 use crate::ttf::table_directory::TTFTableDirectory;
-use crate::ttf::types::{Reader, Tag};
+use crate::ttf::types::{uint32, Reader, Tag};
 
 pub struct Font<'a> {
     reader: Reader<'a>,
@@ -73,7 +73,7 @@ impl Font<'_> {
         }
     }
 
-    pub fn read_loca(&mut self) {
+    fn read_loca(&mut self) {
         let loca_record = self
             .directory
             .get_table_record(&Tag::from_str("loca"))
@@ -110,5 +110,14 @@ impl Font<'_> {
             let glyph = Glyph::read_from(&mut self.reader);
             self.glyf.push(glyph);
         }
+    }
+
+    pub fn render_glyph(&self, code: uint32) {
+        let index = self.cmap
+            .get_glyph_id(code)
+            .expect("Failed to find glyph ID for the given code point");
+
+        let glyph = &self.glyf[index as usize];
+        println!("{:?}", glyph)
     }
 }

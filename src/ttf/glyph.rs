@@ -1,5 +1,6 @@
 use crate::ttf::types::{Reader, int16, uint8, uint16};
 
+#[derive(Debug)]
 pub struct GlyphHeader {
     number_of_contours: int16,
     x_min: int16,
@@ -8,6 +9,7 @@ pub struct GlyphHeader {
     y_max: int16,
 }
 
+#[derive(Debug)]
 pub struct SimpleGlyph {
     header: GlyphHeader,
     end_pts_of_contours: Vec<uint16>,
@@ -19,10 +21,12 @@ pub struct SimpleGlyph {
 }
 
 // TODO
+#[derive(Debug)]
 pub struct CompositeGlyph {
     header: GlyphHeader,
 }
 
+#[derive(Debug)]
 pub enum Glyph {
     Simple(SimpleGlyph),
     Composite(CompositeGlyph),

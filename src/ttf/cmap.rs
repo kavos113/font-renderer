@@ -1,3 +1,4 @@
+use std::process::id;
 use crate::ttf::types::{int16, uint16, uint24, uint32, uint8, Offset32, Reader};
 
 pub struct CmapHeader {
@@ -107,6 +108,10 @@ impl SubtableFormat0 {
             glyph_id_array,
         }
     }
+
+    pub fn get_glyph_id(&self, char_code: uint8) -> uint8 {
+        self.glyph_id_array[char_code as usize]
+    }
 }
 
 struct SubtableFormat2 {
@@ -195,6 +200,27 @@ impl SubtableFormat4 {
             id_range_offset,
             glyph_id_array: (0..glyph_id_array_length).map(|_| reader.read_uint16()).collect(),
         }
+    }
+
+    fn get_glyph_id(&self, char_code: uint16) -> Option<uint16> {
+        let seg_count = self.seg_count_x2 / 2;
+
+        for idx in 0..seg_count {
+            let i = idx as usize;
+
+            if char_code >= self.start_code[i] && char_code <= self.end_code[i] {
+                if self.id_range_offset[i] == 0 {
+                    return Some((char_code as int16 + self.id_delta[i]) as uint16);
+                } else {
+                    let offset = self.id_range_offset[i] / 2
+                        + (char_code - self.start_code[i]) as uint16
+                        - (seg_count - idx) as uint16;
+                    return Some(self.glyph_id_array[offset as usize]);
+                }
+            }
+        }
+
+        None
     }
 }
 
@@ -428,6 +454,21 @@ impl CmapSubtable {
             13 => CmapSubtable::Format13(SubtableFormat13::read_from(reader, format)),
             14 => CmapSubtable::Format14(SubtableFormat14::read_from(reader, format)),
             _ => panic!("Unsupported cmap subtable format: {}", format),
+        }
+    }
+
+    pub fn get_glyph_id(&self, char_code: uint32) -> Option<uint16> {
+        match self {
+            CmapSubtable::Format0(subtable) => {
+                if char_code <= 255 {
+                    Some(subtable.get_glyph_id(char_code as uint8) as uint16)
+                } else {
+                    None
+                }
+            }
+            CmapSubtable::Format4(subtable) => subtable.get_glyph_id(char_code as uint16),
+            // TODO implement get_glyph_id for other formats
+            _ => None,
         }
     }
 }
