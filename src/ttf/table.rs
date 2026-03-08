@@ -158,3 +158,45 @@ impl HheaTable {
         }
     }
 }
+
+pub struct LongHorMetrics {
+    pub advance_width: UFWORD,
+    pub lsb: FWORD,
+}
+
+pub struct HmtxTable {
+    pub long_hor_metrics: Vec<LongHorMetrics>,
+    pub left_side_bearings: Vec<FWORD>,
+}
+
+impl HmtxTable {
+    pub const TAG: &str = "hmtx";
+
+    pub fn read_from(reader: &mut Reader, number_of_h_metrics: uint16, num_glyphs: uint16) -> Self {
+        let mut long_hor_metrics = Vec::new();
+        for _ in 0..number_of_h_metrics {
+            long_hor_metrics.push(LongHorMetrics {
+                advance_width: reader.read_ufword(),
+                lsb: reader.read_fword(),
+            });
+        }
+
+        let mut left_side_bearings = Vec::new();
+        for _ in number_of_h_metrics..num_glyphs {
+            left_side_bearings.push(reader.read_fword());
+        }
+
+        HmtxTable {
+            long_hor_metrics,
+            left_side_bearings,
+        }
+    }
+
+    pub fn get_advance_width(&self, glyph_index: usize) -> UFWORD {
+        if glyph_index < self.long_hor_metrics.len() {
+            self.long_hor_metrics[glyph_index].advance_width
+        } else {
+            self.long_hor_metrics.last().unwrap().advance_width
+        }
+    }
+}

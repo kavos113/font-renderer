@@ -1,7 +1,8 @@
+use crate::renderer::pbm::{Image, ImageWithSpace};
 use crate::renderer::render::render_glyph;
 use crate::ttf::cmap::{CmapHeader, CmapSubtable, PlatformId};
 use crate::ttf::glyph::Glyph;
-use crate::ttf::table::{HeadTable, MaxpTable, MaxpTable1_0};
+use crate::ttf::table::{HeadTable, HheaTable, HmtxTable, MaxpTable, MaxpTable1_0};
 use crate::ttf::table_directory::TTFTableDirectory;
 use crate::ttf::types::{Reader, Tag, uint32};
 
@@ -13,6 +14,8 @@ pub struct Font<'a> {
     cmap: CmapSubtable,
     loca: Vec<u32>,
     glyf: Vec<Glyph>,
+    hhea: HheaTable,
+    hmtx: HmtxTable,
 }
 
 impl Font<'_> {
@@ -68,6 +71,20 @@ impl Font<'_> {
             panic!("Failed to find a suitable 'cmap' subtable (platform_id=3, encoding_id=1)");
         };
 
+        let hhea_record = table_directory
+            .get_table_record(&Tag::from_str("hhea"))
+            .expect("Failed to find 'hhea' table");
+
+        r.seek(hhea_record.offset as usize);
+        let hhea = HheaTable::read_from(&mut r);
+
+        let hmtx_record = table_directory
+            .get_table_record(&Tag::from_str("hmtx"))
+            .expect("Failed to find 'hmtx' table");
+
+        r.seek(hmtx_record.offset as usize);
+        let hmtx = HmtxTable::read_from(&mut r, maxp_1.num_glyphs, hhea.number_of_h_metrics);
+
         Font {
             reader: r,
             directory: table_directory,
@@ -76,6 +93,8 @@ impl Font<'_> {
             cmap: cmap_subtable,
             loca: vec![],
             glyf: vec![],
+            hhea,
+            hmtx,
         }
     }
 
@@ -129,5 +148,33 @@ impl Font<'_> {
 
         let img = render_glyph(glyph);
         img.write_to_ppm("glyph.ppm").expect("Failed to write image");
+    }
+
+    pub fn render_text(&self, text: &str) {
+        let glyphs_info: Vec<ImageWithSpace> = text
+            .chars()
+            .map(|c| {
+                let code = c as u32;
+
+                let index = self
+                    .cmap
+                    .get_glyph_id(code)
+                    .expect("Failed to find glyph ID for the given code point");
+                let glyph = &self.glyf[index as usize];
+
+                let img = render_glyph(glyph);
+
+                let advance_width = self.hmtx.get_advance_width(index as usize) as u32;
+                let space = advance_width.saturating_sub(img.width);
+
+                ImageWithSpace {
+                    image: img,
+                    space,
+                }
+            })
+            .collect();
+
+        let final_image = Image::concat_all(&glyphs_info);
+        final_image.write_to_ppm("text.ppm").expect("Failed to write image");
     }
 }

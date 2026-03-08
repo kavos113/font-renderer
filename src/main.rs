@@ -17,4 +17,6 @@ fn main() {
     font.read_glyf();
 
     font.render_glyph(0x46); // Render 'F'
+
+    font.render_text("Hello, World!");
 }

@@ -10,8 +10,6 @@ pub fn render_glyph(glyph: &Glyph) -> Image {
         }
     };
 
-    println!("rendering points: {:?}", g.points);
-
     let width = (g.header.x_max - g.header.x_min) as u32 + 1;
     let height = (g.header.y_max - g.header.y_min) as u32 + 1;
 
