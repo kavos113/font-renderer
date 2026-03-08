@@ -1,3 +1,4 @@
+use crate::ttf::cmap::{CmapHeader, CmapSubtable, PlatformId};
 use crate::ttf::glyph::Glyph;
 use crate::ttf::table::{HeadTable, MaxpTable, MaxpTable1_0};
 use crate::ttf::table_directory::TTFTableDirectory;
@@ -8,6 +9,7 @@ pub struct Font<'a> {
     directory: TTFTableDirectory,
     head: HeadTable,
     maxp: MaxpTable1_0,
+    cmap: CmapSubtable,
     loca: Vec<u32>,
     glyf: Vec<Glyph>,
 }
@@ -39,11 +41,33 @@ impl Font<'_> {
             MaxpTable::Version1_0(table) => table,
         };
 
+        let cmap_record = table_directory
+            .get_table_record(&Tag::from_str("cmap"))
+            .expect("Failed to find 'cmap' table");
+
+        r.seek(cmap_record.offset as usize);
+
+        let header = CmapHeader::read_from(&mut r);
+
+        // example: platform_id = 3 (Windows), encoding_id = 1 (Unicode BMP)
+        let subtable = header
+            .encoding_records
+            .iter()
+            .find(|record| record.platform_id == PlatformId::Windows && record.encoding_id == 1);
+
+        let cmap_subtable = if let Some(record) = subtable {
+            r.seek(cmap_record.offset as usize + record.offset as usize);
+            CmapSubtable::read_from(&mut r)
+        } else {
+            panic!("Failed to find a suitable 'cmap' subtable (platform_id=3, encoding_id=1)");
+        };
+
         Font {
             reader: r,
             directory: table_directory,
             head,
             maxp: maxp_1,
+            cmap: cmap_subtable,
             loca: vec![],
             glyf: vec![],
         }

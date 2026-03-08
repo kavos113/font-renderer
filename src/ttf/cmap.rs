@@ -1,18 +1,19 @@
 use crate::ttf::types::{int16, uint16, uint24, uint32, uint8, Offset32, Reader};
 
-struct CmapHeader {
+pub struct CmapHeader {
     version: uint16,
     num_tables: uint16,
-    encoding_records: Vec<CmapEncodingRecord>,
+    pub encoding_records: Vec<CmapEncodingRecord>,
 }
 
-struct CmapEncodingRecord {
-    platform_id: PlatformId,
-    encoding_id: uint16,
-    offset: uint16,
+pub struct CmapEncodingRecord {
+    pub platform_id: PlatformId,
+    pub encoding_id: uint16,
+    pub offset: uint16,
 }
 
-enum PlatformId {
+#[derive(Eq, PartialEq)]
+pub enum PlatformId {
     Unicode = 0,
     Macintosh = 1,
     Iso = 2,
