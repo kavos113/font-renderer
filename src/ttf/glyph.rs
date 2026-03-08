@@ -11,9 +11,9 @@ pub struct GlyphHeader {
 
 #[derive(Debug)]
 pub struct GlyphPoint {
-    x: int16,
-    y: int16,
-    on_curve: bool,
+    pub x: int16,
+    pub y: int16,
+    pub on_curve: bool,
 }
 
 #[derive(Debug)]
@@ -22,7 +22,7 @@ pub struct SimpleGlyph {
     end_pts_of_contours: Vec<uint16>,
     instruction_length: uint16,
     instructions: Vec<uint8>,
-    points: Vec<GlyphPoint>,
+    pub points: Vec<GlyphPoint>,
 }
 
 // TODO
