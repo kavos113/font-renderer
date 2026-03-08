@@ -1,3 +1,4 @@
+use crate::renderer::render::render_glyph;
 use crate::ttf::cmap::{CmapHeader, CmapSubtable, PlatformId};
 use crate::ttf::glyph::Glyph;
 use crate::ttf::table::{HeadTable, MaxpTable, MaxpTable1_0};
@@ -49,11 +50,11 @@ impl Font<'_> {
 
         let header = CmapHeader::read_from(&mut r);
 
-        // example: platform_id = 0 (Unicode), encoding_id = 3 (Unicode BMP)
+        // example: platform_id = 3 (Windows), encoding_id = 1 (Unicode BMP)
         let subtable = header
             .encoding_records
             .iter()
-            .find(|record| record.platform_id == PlatformId::Unicode && record.encoding_id == 3);
+            .find(|record| record.platform_id == PlatformId::Windows && record.encoding_id == 1);
 
         header
             .encoding_records
@@ -125,6 +126,8 @@ impl Font<'_> {
             .expect("Failed to find glyph ID for the given code point");
 
         let glyph = &self.glyf[index as usize];
-        println!("{:?}", glyph)
+
+        let img = render_glyph(glyph);
+        img.write_to_ppm("glyph.ppm").expect("Failed to write image");
     }
 }

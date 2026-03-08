@@ -10,6 +10,8 @@ pub fn render_glyph(glyph: &Glyph) -> Image {
         }
     };
 
+    println!("rendering points: {:?}", g.points);
+
     let width = (g.header.x_max - g.header.x_min) as u32 + 1;
     let height = (g.header.y_max - g.header.y_min) as u32 + 1;
 
@@ -48,6 +50,14 @@ pub fn render_glyph(glyph: &Glyph) -> Image {
             }
         }
     }
+
+    // g.points
+    //     .iter()
+    //     .for_each(|p| {
+    //         let x = (p.x - g.header.x_min) as u32;
+    //         let y = (g.header.y_max - p.y) as u32;
+    //         image.set_pixel(x, y, true);
+    //     });
 
     image
 }

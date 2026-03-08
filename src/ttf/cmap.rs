@@ -10,7 +10,7 @@ pub struct CmapHeader {
 pub struct CmapEncodingRecord {
     pub platform_id: PlatformId,
     pub encoding_id: uint16,
-    pub offset: uint16,
+    pub offset: Offset32,
 }
 
 #[derive(Eq, PartialEq, Debug)]
@@ -73,7 +73,7 @@ impl CmapHeader {
                 platform_id: PlatformId::try_from(reader.read_uint16())
                     .unwrap_or(PlatformId::Custom),
                 encoding_id: reader.read_uint16(),
-                offset: reader.read_uint16(),
+                offset: reader.read_offset32(),
             })
             .collect();
 
@@ -157,6 +157,7 @@ impl SubtableFormat2 {
 struct SubtableFormat4 {
     format: uint16,
     length: uint16,
+    language: uint16,
     seg_count_x2: uint16,
     search_range: uint16,
     entry_selector: uint16,
@@ -172,6 +173,7 @@ struct SubtableFormat4 {
 impl SubtableFormat4 {
     fn read_from(reader: &mut Reader, format: uint16) -> Self {
         let length = reader.read_uint16();
+        let language = reader.read_uint16();
         let seg_count_x2 = reader.read_uint16();
         let search_range = reader.read_uint16();
         let entry_selector = reader.read_uint16();
@@ -190,6 +192,7 @@ impl SubtableFormat4 {
         SubtableFormat4 {
             format,
             length,
+            language,
             seg_count_x2,
             search_range,
             entry_selector,
@@ -218,7 +221,13 @@ impl SubtableFormat4 {
                     let offset = self.id_range_offset[i] / 2
                         + (char_code - self.start_code[i]) as uint16
                         - (seg_count - idx) as uint16;
-                    return Some(self.glyph_id_array[offset as usize]);
+
+                    let raw_glyph_id = self.glyph_id_array[offset as usize];
+                    if raw_glyph_id != 0 {
+                        return Some((raw_glyph_id as int16 + self.id_delta[i]) as uint16);
+                    } else {
+                        return Some(0);
+                    }
                 }
             }
         }

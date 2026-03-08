@@ -16,5 +16,5 @@ fn main() {
     let mut font = Font::from_data(&*buf);
     font.read_glyf();
 
-    font.render_glyph(0x41); // Render 'A'
+    font.render_glyph(0x46); // Render 'F'
 }

@@ -41,4 +41,24 @@ impl Image {
 
         Ok(())
     }
+
+    pub fn write_to_ppm(&self, filename: &str) -> std::io::Result<()> {
+        let file = File::create(filename)?;
+        let mut writer = BufWriter::new(file);
+
+        // Write PPM header
+        writer.write_all(format!("P3\n{} {}\n255\n", self.width, self.height).as_bytes())?;
+
+        // Write pixel data
+        for y in 0..self.height {
+            for x in 0..self.width {
+                let value = if self.data[(y * self.width + x) as usize] { "255 255 255" } else { "0 0 0" };
+                writer.write_all(value.as_bytes())?;
+                writer.write_all(b" ")?;
+            }
+            writer.write_all(b"\n")?;
+        }
+
+        Ok(())
+    }
 }
