@@ -1,4 +1,4 @@
-use crate::ttf::types::{Fixed, LONGDATETIME, Reader, Tag, Version16Dot16, int16, uint16, uint32};
+use crate::ttf::types::{Fixed, LONGDATETIME, Reader, Tag, Version16Dot16, int16, uint16, uint32, FWORD, UFWORD};
 
 pub struct HeadTable {
     pub major_version: uint16,
@@ -108,6 +108,53 @@ impl MaxpTable {
             })
         } else {
             panic!("Unsupported 'maxp' table version: {}", version.to_string());
+        }
+    }
+}
+
+pub struct HheaTable {
+    pub major_version: uint16,
+    pub minor_version: uint16,
+    pub ascender: FWORD,
+    pub descender: FWORD,
+    pub line_gap: FWORD,
+    pub advance_width_max: UFWORD,
+    pub min_left_side_bearing: FWORD,
+    pub min_right_side_bearing: FWORD,
+    pub x_max_extent: FWORD,
+    pub caret_slope_rise: int16,
+    pub caret_slope_run: int16,
+    pub caret_offset: int16,
+    pub reserved: [int16; 4],
+    pub metric_data_format: int16,
+    pub number_of_h_metrics: uint16,
+}
+
+impl HheaTable {
+    pub const TAG: &str = "hhea";
+
+    pub fn read_from(reader: &mut Reader) -> Self {
+        HheaTable {
+            major_version: reader.read_uint16(),
+            minor_version: reader.read_uint16(),
+            ascender: reader.read_fword(),
+            descender: reader.read_fword(),
+            line_gap: reader.read_fword(),
+            advance_width_max: reader.read_ufword(),
+            min_left_side_bearing: reader.read_fword(),
+            min_right_side_bearing: reader.read_fword(),
+            x_max_extent: reader.read_fword(),
+            caret_slope_rise: reader.read_int16(),
+            caret_slope_run: reader.read_int16(),
+            caret_offset: reader.read_int16(),
+            reserved: [
+                reader.read_int16(),
+                reader.read_int16(),
+                reader.read_int16(),
+                reader.read_int16(),
+            ],
+            metric_data_format: reader.read_int16(),
+            number_of_h_metrics: reader.read_uint16(),
         }
     }
 }
