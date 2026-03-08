@@ -2,7 +2,7 @@ use crate::ttf::cmap::{CmapHeader, CmapSubtable, PlatformId};
 use crate::ttf::glyph::Glyph;
 use crate::ttf::table::{HeadTable, MaxpTable, MaxpTable1_0};
 use crate::ttf::table_directory::TTFTableDirectory;
-use crate::ttf::types::{uint32, Reader, Tag};
+use crate::ttf::types::{Reader, Tag, uint32};
 
 pub struct Font<'a> {
     reader: Reader<'a>,
@@ -60,7 +60,6 @@ impl Font<'_> {
             .iter()
             .for_each(|record| println!("Found 'cmap' encoding record: {:?}", record));
 
-
         let cmap_subtable = if let Some(record) = subtable {
             r.seek(cmap_record.offset as usize + record.offset as usize);
             CmapSubtable::read_from(&mut r)
@@ -112,14 +111,16 @@ impl Font<'_> {
         self.reader.seek(glyf_record.offset as usize);
 
         for offset in &self.loca {
-            self.reader.seek(glyf_record.offset as usize + *offset as usize);
+            self.reader
+                .seek(glyf_record.offset as usize + *offset as usize);
             let glyph = Glyph::read_from(&mut self.reader);
             self.glyf.push(glyph);
         }
     }
 
     pub fn render_glyph(&self, code: uint32) {
-        let index = self.cmap
+        let index = self
+            .cmap
             .get_glyph_id(code)
             .expect("Failed to find glyph ID for the given code point");
 

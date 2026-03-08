@@ -3,10 +3,10 @@ use crate::ttf::types::{Reader, int16, uint8, uint16};
 #[derive(Debug)]
 pub struct GlyphHeader {
     number_of_contours: int16,
-    x_min: int16,
-    y_min: int16,
-    x_max: int16,
-    y_max: int16,
+    pub x_min: int16,
+    pub y_min: int16,
+    pub x_max: int16,
+    pub y_max: int16,
 }
 
 #[derive(Debug)]
@@ -18,7 +18,7 @@ pub struct GlyphPoint {
 
 #[derive(Debug)]
 pub struct SimpleGlyph {
-    header: GlyphHeader,
+    pub header: GlyphHeader,
     end_pts_of_contours: Vec<uint16>,
     instruction_length: uint16,
     instructions: Vec<uint8>,
@@ -28,7 +28,7 @@ pub struct SimpleGlyph {
 // TODO
 #[derive(Debug)]
 pub struct CompositeGlyph {
-    header: GlyphHeader,
+    pub header: GlyphHeader,
 }
 
 #[derive(Debug)]
@@ -57,10 +57,7 @@ impl Glyph {
                 .map(|_| reader.read_uint8())
                 .collect();
 
-            let num_points = end_pts_of_contours
-                .last()
-                .unwrap_or(&0)
-                + 1;
+            let num_points = end_pts_of_contours.last().unwrap_or(&0) + 1;
 
             let mut i = 0;
             let mut repeat_count = 0;
@@ -119,7 +116,8 @@ impl Glyph {
                 y_coordinates.push(curr);
             }
 
-            let points: Vec<GlyphPoint> = x_coordinates.into_iter()
+            let points: Vec<GlyphPoint> = x_coordinates
+                .into_iter()
                 .zip(y_coordinates.into_iter())
                 .zip(flags.into_iter())
                 .map(|((x, y), flag)| GlyphPoint {

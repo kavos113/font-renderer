@@ -1,5 +1,5 @@
-use std::{env, fs};
 use crate::renderer::loader::Font;
+use std::{env, fs};
 
 pub mod renderer;
 pub mod ttf;

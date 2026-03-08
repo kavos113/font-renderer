@@ -1,4 +1,4 @@
-use crate::ttf::types::{int16, uint16, uint24, uint32, uint8, Offset32, Reader};
+use crate::ttf::types::{Offset32, Reader, int16, uint8, uint16, uint24, uint32};
 
 pub struct CmapHeader {
     version: uint16,
@@ -70,7 +70,8 @@ impl CmapHeader {
 
         let encoding_records = (0..num_tables)
             .map(|_| CmapEncodingRecord {
-                platform_id: PlatformId::try_from(reader.read_uint16()).unwrap_or(PlatformId::Custom),
+                platform_id: PlatformId::try_from(reader.read_uint16())
+                    .unwrap_or(PlatformId::Custom),
                 encoding_id: reader.read_uint16(),
                 offset: reader.read_uint16(),
             })
@@ -198,7 +199,9 @@ impl SubtableFormat4 {
             start_code,
             id_delta,
             id_range_offset,
-            glyph_id_array: (0..glyph_id_array_length).map(|_| reader.read_uint16()).collect(),
+            glyph_id_array: (0..glyph_id_array_length)
+                .map(|_| reader.read_uint16())
+                .collect(),
         }
     }
 
